@@ -1,6 +1,8 @@
 package org.powerimo.sqb.starter;
 
 import org.junit.jupiter.api.Test;
+import org.powerimo.sqb.ConditionType;
+import org.powerimo.sqb.annotations.Limit;
 import org.powerimo.sqb.annotations.SearchParam;
 import org.powerimo.sqb.annotations.SearchSource;
 
@@ -12,8 +14,10 @@ public class TestSqb {
     public static class SampleParams1 {
         @SearchParam(fieldName = "f1")
         String field1 = "aaa";
-        @SearchParam
+        @SearchParam(conditionType = ConditionType.GREATER)
         Integer field2 = 123;
+        @Limit
+        Integer limitField = 9;
     }
 
     @Test

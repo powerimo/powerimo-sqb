@@ -61,6 +61,10 @@ public class StandardSimpleQueryBuilder implements SimpleQueryBuilder, QueryDeta
             }
         }
 
+        if (searchParamsProvider.getLimit() != null) {
+            limitPart = "limit " + searchParamsProvider.getLimit().toString();
+        }
+
         StringBuilder result = new StringBuilder();
         result.append(selectPart).append(" ").append(fromPart);
         if (wherePart != null)
