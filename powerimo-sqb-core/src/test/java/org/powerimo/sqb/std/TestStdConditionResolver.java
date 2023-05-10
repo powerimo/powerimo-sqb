@@ -85,7 +85,7 @@ public class TestStdConditionResolver {
         var condition = Condition.builder()
                 .type(ConditionType.IN_SQL)
                 .field("f1")
-                .value("(select id from table2)")
+                .customConditionText("(select id from table2)")
                 .build();
         resolver.handleCondition(condition, sqb);
 

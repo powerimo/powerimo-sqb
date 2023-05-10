@@ -18,4 +18,5 @@ public @interface SearchParam {
     String sqlTypeName() default "";
     ConditionType conditionType() default ConditionType.EQUAL;
     Class<? extends ConditionResolver> resolver() default StdConditionResolver.class;
+    String customConditionText() default "";
 }

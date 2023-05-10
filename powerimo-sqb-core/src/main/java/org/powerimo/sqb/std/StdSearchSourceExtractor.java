@@ -62,13 +62,21 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
             throw new RuntimeException(e);
         }
 
+        String searchFieldName;
+        if (searchParam.fieldName() != null && !searchParam.fieldName().isEmpty()) {
+            searchFieldName = searchParam.fieldName();
+        } else {
+            searchFieldName = field.getName();
+        }
+
         Condition condition = Condition.builder()
-                .field(searchParam.fieldName())
+                .field(searchFieldName)
                 .value(value)
                 .type(searchParam.conditionType())
                 .sqlType(searchParam.sqlType())
                 .sqlTypeName(searchParam.sqlTypeName())
                 .resolverClass(searchParam.resolver())
+                .customConditionText(searchParam.customConditionText())
                 .build();
         conditionList.add(condition);
     }
