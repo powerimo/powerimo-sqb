@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSqb {
 
+    @SuppressWarnings("unused")
     @SearchSource(table = "table1", alias = "t1")
     public static class SampleParams1 {
         @SearchParam(fieldName = "f1")
@@ -21,7 +22,7 @@ public class TestSqb {
     }
 
     @Test
-    void baseTest() {
+    void searchSourceTest() {
         var params = new SampleParams1();
         Sqb sqb = new Sqb(params);
 
@@ -31,5 +32,7 @@ public class TestSqb {
         assertEquals(2, sqb.getNamedParams().getParameterNames().length);
         assertTrue(sqb.getQuery().contains("f1"));
         assertTrue(sqb.getQuery().contains("field2"));
+        assertNotNull(sqb.getDetailParams());
     }
+
 }

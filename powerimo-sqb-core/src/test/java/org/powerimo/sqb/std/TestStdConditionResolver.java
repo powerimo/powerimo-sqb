@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestStdConditionResolver {
-    private StdConditionResolver resolver = new StdConditionResolver();
+    private final StdConditionResolver resolver = new StdConditionResolver();
 
     private StandardSimpleQueryBuilder createSqb() {
         var sqb = new StandardSimpleQueryBuilder();

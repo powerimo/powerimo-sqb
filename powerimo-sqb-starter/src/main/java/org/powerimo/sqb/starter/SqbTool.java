@@ -7,8 +7,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 public class SqbTool {
 
-
-
     public static MapSqlParameterSource createNamedParams(@NonNull QueryDetails details) {
         if (details.getQueryParams() == null) {
             throw new SqbException("getQueryParams in QueryDetails is null");
