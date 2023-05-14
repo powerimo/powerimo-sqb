@@ -49,7 +49,7 @@ public class StdConditionResolver implements ConditionResolver {
                 break;
             case LIKE:
                 conditionLike();
-                break;;
+                break;
             default:
                 throw new SqbException("Not supported condition type: " + condition.getType());
         }
