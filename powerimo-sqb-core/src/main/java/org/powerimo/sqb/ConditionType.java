@@ -13,5 +13,6 @@ public enum ConditionType {
     GREATER,
     GREATER_OR_EQUAL,
     LESS,
-    LESS_OR_EQUAL
+    LESS_OR_EQUAL,
+    LIKE;
 }

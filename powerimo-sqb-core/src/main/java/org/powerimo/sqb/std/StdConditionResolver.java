@@ -47,6 +47,9 @@ public class StdConditionResolver implements ConditionResolver {
             case IN_SQL:
                 conditionInSql();
                 break;
+            case LIKE:
+                conditionLike();
+                break;
             default:
                 throw new SqbException("Not supported condition type: " + condition.getType());
         }
@@ -115,6 +118,12 @@ public class StdConditionResolver implements ConditionResolver {
     protected void conditionLessOrEqual() {
         var name = getNextParamName();
         details.addWhere(condition.getField() + "<=" + inlineParamName(name));
+        details.getQueryParams().add(createParam(name, condition));
+    }
+
+    protected void conditionLike() {
+        var name = getNextParamName();
+        details.addWhere(condition.getField() + " like " + inlineParamName(name));
         details.getQueryParams().add(createParam(name, condition));
     }
 
