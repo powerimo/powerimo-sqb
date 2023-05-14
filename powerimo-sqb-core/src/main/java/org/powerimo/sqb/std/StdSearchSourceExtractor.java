@@ -5,6 +5,7 @@ import org.powerimo.sqb.Condition;
 import org.powerimo.sqb.SearchParamsProvider;
 import org.powerimo.sqb.TableSource;
 import org.powerimo.sqb.annotations.Limit;
+import org.powerimo.sqb.annotations.Offset;
 import org.powerimo.sqb.annotations.SearchParam;
 import org.powerimo.sqb.annotations.SearchSource;
 
@@ -22,6 +23,7 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
     private String selectFields = "*";
     private String orderBy;
     private Integer limit;
+    private Integer offset;
     private boolean isSourceObject = false;
 
     public StdSearchSourceExtractor(@NonNull Object obj) {
@@ -38,20 +40,33 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
     }
 
     protected void readAttributes() {
+        // extract conditions
         var fields = getFieldsWithAnnotation(searchSourceObject.getClass(), SearchParam.class);
         fields.forEach( (field) -> {
             var searchParam = field.getAnnotation(SearchParam.class);
             addCondition(searchParam, field);
         });
 
+        // extract limit
         fields = getFieldsWithAnnotation(searchSourceObject.getClass(), Limit.class);
         if (fields.size() > 0) {
             var limitParam = fields.get(0).getAnnotation(Limit.class);
             populateLimit(limitParam, fields.get(0));
         }
 
+        // extract offset
+        fields = getFieldsWithAnnotation(searchSourceObject.getClass(), Offset.class);
+        if (fields.size() > 0) {
+            var limitParam = fields.get(0).getAnnotation(Offset.class);
+            populateLimitOffset(limitParam, fields.get(0));
+        }
     }
 
+    /**
+     * add a condition base on an annotation and a field
+     * @param searchParam an annotation object
+     * @param field a field of source object class
+     */
     protected void addCondition(SearchParam searchParam, Field field) {
         field.setAccessible(true);
 
@@ -62,6 +77,8 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
             throw new RuntimeException(e);
         }
 
+        // if the fieldName value in annotation is specified, it will be used
+        // if not, the field name in object class will beused
         String searchFieldName;
         if (searchParam.fieldName() != null && !searchParam.fieldName().isEmpty()) {
             searchFieldName = searchParam.fieldName();
@@ -69,6 +86,12 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
             searchFieldName = field.getName();
         }
 
+        // check null value with the ignoreNullsFlag
+        if (value == null && searchParam.ignoreNulls()) {
+            return;
+        }
+
+        // add a condition to the list of conditions
         Condition condition = Condition.builder()
                 .field(searchFieldName)
                 .value(value)
@@ -81,7 +104,39 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
         conditionList.add(condition);
     }
 
+    /**
+     * Set limit based on the Limit annotation field
+     * @param limitParam an annotation object
+     * @param field a field
+     */
     protected void populateLimit(Limit limitParam, Field field) {
+        field.setAccessible(true);
+        Object value;
+        try {
+            value =  field.get(searchSourceObject);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (value == null) {
+            limit = null;
+            return;
+        }
+
+        if (value instanceof Integer) {
+            limit = (Integer) value;
+        } else if (value instanceof Long) {
+            limit = ((Long) value).intValue();
+        } else
+            limit = null;
+    }
+
+    /**
+     * Set offset in limit based on Offset annotation
+     * @param offsetParam an annotation object
+     * @param field a field of source object
+     */
+    protected void populateLimitOffset(Offset offsetParam, Field field) {
         field.setAccessible(true);
         Object value;
         try {
@@ -121,39 +176,8 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
     }
 
     @Override
-    public TableSource getPrimaryTable() {
-        return primaryTable;
-    }
-
-    @Override
-    public void setPrimaryTable(TableSource source) {
-        primaryTable(source.getTable(), source.getAlias());
-    }
-
-    @Override
-    public void primaryTable(String table, String alias) {
-        primaryTable.setTable(table);
-        primaryTable.setAlias(alias);
-    }
-
-    @Override
-    public String getSelectFields() {
-        return selectFields;
-    }
-
-    @Override
-    public void setSelectFields(String fields) {
-        selectFields = fields;
-    }
-
-    @Override
     public String getOrderBy() {
         return orderBy;
-    }
-
-    @Override
-    public void setOrderBy(String orderBy) {
-        this.orderBy = orderBy;
     }
 
     @Override
@@ -161,12 +185,12 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
         return limit;
     }
 
-    @Override
-    public void setLimit(Integer value) {
-        limit = value;
-    }
-
     public boolean isSourceObject() {
         return this.isSourceObject;
+    }
+
+    @Override
+    public Integer getLimitOffset() {
+        return offset;
     }
 }

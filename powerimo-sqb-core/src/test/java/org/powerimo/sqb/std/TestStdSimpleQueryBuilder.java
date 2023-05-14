@@ -5,20 +5,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TestStandardSimpleQueryBuilder {
+public class TestStdSimpleQueryBuilder {
 
     @Test
     void standard1() {
-        var params = MapSearchParams.builder()
-                .table("table1")
-                .alias("t")
+        var params = StdSearchParams.builder()
                 .whereEqual("f1", "aaa")
                 .whereNullableEqual("f2", "bbb")
                 .whereNullableEqual("f3", null)
                 .whereInSql("f4", "(select id from t2)")
                 .build();
 
-        var qb = new StandardSimpleQueryBuilder();
+        var qb = new StdSimpleQueryBuilder()
+                .searchParams(params)
+                .fromProvider(new FromStringInfo("select *", "from table1 t"));
         var text = qb.prepareText(params);
 
         assertNotNull(text);
