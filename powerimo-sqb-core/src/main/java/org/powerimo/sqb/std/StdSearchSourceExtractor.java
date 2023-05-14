@@ -3,7 +3,6 @@ package org.powerimo.sqb.std;
 import lombok.NonNull;
 import org.powerimo.sqb.Condition;
 import org.powerimo.sqb.SearchParamsProvider;
-import org.powerimo.sqb.TableSource;
 import org.powerimo.sqb.annotations.Limit;
 import org.powerimo.sqb.annotations.Offset;
 import org.powerimo.sqb.annotations.SearchParam;
@@ -16,11 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class StdSearchSourceExtractor implements SearchParamsProvider {
-    private final TableSource primaryTable = new TableSource();
     private SearchSource searchSourceAnnotation;
     private Object searchSourceObject;
     private final List<Condition> conditionList = new LinkedList<>();
-    private String selectFields = "*";
     private String orderBy;
     private Integer limit;
     private Integer offset;
@@ -30,8 +27,6 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
         isSourceObject = false;
         if (obj.getClass().isAnnotationPresent(SearchSource.class)) {
             var annotation = (obj.getClass().getAnnotation(SearchSource.class));
-            primaryTable.setTable(annotation.table());
-            primaryTable.setAlias(annotation.alias());
             searchSourceAnnotation = annotation;
             searchSourceObject = obj;
             isSourceObject = true;
