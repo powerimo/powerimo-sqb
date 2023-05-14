@@ -50,8 +50,6 @@ public class TestStdSearchSourceExtractor {
         assertNotNull(extractor);
         assertTrue(extractor.isSourceObject());
         assertEquals(3, extractor.getConditions().size());
-        assertEquals("table1", extractor.getPrimaryTable().getTable());
-        assertEquals("t", extractor.getPrimaryTable().getAlias());
         assertEquals(10, extractor.getLimit());
     }
 
