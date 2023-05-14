@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.powerimo.sqb.annotations.SearchParam;
 import org.powerimo.sqb.annotations.SearchSource;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSearchAnnotationProcessor {
@@ -23,10 +26,12 @@ public class TestSearchAnnotationProcessor {
         assertNotNull(info);
         assertNotNull(info.getFromInfo());
         assertNotNull(info.getSearchParamsProvider());
-        String s = "select *\r\n" +
-                "from table1 t1\r\n" +
-                "    join table2 t2 on t1.parent_id=t2.id";
-        assertEquals(s, info.getFromInfo().getSelectFromText());
+        var is = this.getClass().getClassLoader().getResourceAsStream("test_sap.sql");
+        String resourceText;
+        try (Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
+            resourceText = scanner.useDelimiter("\\A").next();
+        }
+        assertEquals(resourceText, info.getFromInfo().getSelectFromText());
         assertEquals(1, info.getSearchParamsProvider().getConditions().size());
     }
 
