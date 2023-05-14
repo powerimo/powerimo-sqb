@@ -1,9 +1,5 @@
 package org.powerimo.sqb;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.powerimo.sqb.FromInfo;
-import org.powerimo.sqb.SearchParamsProvider;
 import org.powerimo.sqb.annotations.SearchSource;
 import org.powerimo.sqb.std.FromResourceInfo;
 import org.powerimo.sqb.std.FromStringInfo;
@@ -11,8 +7,8 @@ import org.powerimo.sqb.std.StdSearchSourceExtractor;
 
 public class SearchAnnotationProcessor {
 
-    public static ExtractedInfo extractInfo(Object searchParams) {
-        ExtractedInfo extractedInfo = new ExtractedInfo();
+    public static ProvidersConfig extractInfo(Object searchParams) {
+        ProvidersConfig extractedInfo = new ProvidersConfig();
         extractedInfo.sourceSearchParams = searchParams;
 
         if (searchParams.getClass().isAnnotationPresent(SearchSource.class)) {
@@ -23,7 +19,7 @@ public class SearchAnnotationProcessor {
         return extractedInfo;
     }
 
-    public static void buildFromInfo(SearchSource annotation, ExtractedInfo extractedInfo) {
+    public static void buildFromInfo(SearchSource annotation, ProvidersConfig extractedInfo) {
         extractedInfo.fromInfo = null;
         if (annotation.resource() != null) {
             extractedInfo.fromInfo = new FromResourceInfo(annotation.resource());
@@ -39,15 +35,8 @@ public class SearchAnnotationProcessor {
         }
     }
 
-    public static void buildSearchProvider(SearchSource annotation, ExtractedInfo extractedInfo) {
+    public static void buildSearchProvider(SearchSource annotation, ProvidersConfig extractedInfo) {
         extractedInfo.searchParamsProvider = new StdSearchSourceExtractor(extractedInfo.sourceSearchParams);
     }
 
-    @Getter
-    @Setter
-    public static class ExtractedInfo {
-        private Object sourceSearchParams;
-        private FromInfo fromInfo;
-        private SearchParamsProvider searchParamsProvider;
-    }
 }
