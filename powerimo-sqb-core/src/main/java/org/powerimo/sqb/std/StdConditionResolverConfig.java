@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.powerimo.sqb.Condition;
 import org.powerimo.sqb.ConditionResolver;
 import org.powerimo.sqb.ConditionResolverConfig;
+import org.powerimo.sqb.SqbException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +47,13 @@ public class StdConditionResolverConfig implements ConditionResolverConfig {
 
     @Override
     public ConditionResolver getResolver(Condition condition) {
+        if (condition.getResolverClass() != null) {
+            try {
+                return condition.getResolverClass().getConstructor().newInstance();
+            } catch (Exception ex) {
+                throw new SqbException("Exception on creating instance of ConditionResolver");
+            }
+        }
         if (condition.getValue() != null) {
             return getResolver(condition.getValue().getClass());
         }
