@@ -141,16 +141,16 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
         }
 
         if (value == null) {
-            limit = null;
+            offset = null;
             return;
         }
 
         if (value instanceof Integer) {
-            limit = (Integer) value;
+            offset = (Integer) value;
         } else if (value instanceof Long) {
-            limit = ((Long) value).intValue();
+            offset = ((Long) value).intValue();
         } else
-            limit = null;
+            offset = null;
     }
 
     public static List<Field> getFieldsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annotation) {
