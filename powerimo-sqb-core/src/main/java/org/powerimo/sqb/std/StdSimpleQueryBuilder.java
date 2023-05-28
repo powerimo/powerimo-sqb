@@ -61,6 +61,7 @@ public class StdSimpleQueryBuilder implements SimpleQueryBuilder, QueryDetails {
 
         parseSelectInfo();
         parseConditions();
+        orderPart = searchParamsProvider.getOrderBy();
 
         StringBuilder result = new StringBuilder();
         result.append(selectFromPart);
