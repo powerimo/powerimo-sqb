@@ -168,11 +168,12 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
             throw new RuntimeException(e);
         }
 
-        if (value == null && !Objects.equals(annotation.defaultValue(), "")) {
+        if (value == null) {
+            if (annotation.defaultValue() == null) {
+                orderBy = "";
+                return;
+            }
             value = annotation.defaultValue();
-        } else {
-            orderBy = "";
-            return;
         }
 
         String s = value.toString();
