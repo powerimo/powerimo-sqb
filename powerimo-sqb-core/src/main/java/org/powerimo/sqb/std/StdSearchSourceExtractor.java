@@ -1,18 +1,17 @@
 package org.powerimo.sqb.std;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.powerimo.sqb.Condition;
+import org.powerimo.sqb.OrderDirection;
 import org.powerimo.sqb.SearchParamsProvider;
-import org.powerimo.sqb.annotations.Limit;
-import org.powerimo.sqb.annotations.Offset;
-import org.powerimo.sqb.annotations.SearchParam;
-import org.powerimo.sqb.annotations.SearchSource;
+import org.powerimo.sqb.annotations.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class StdSearchSourceExtractor implements SearchParamsProvider {
     private SearchSource searchSourceAnnotation;
@@ -36,14 +35,14 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
 
     protected void readAttributes() {
         // extract conditions
-        var fields = getFieldsWithAnnotation(searchSourceObject.getClass(), SearchParam.class);
-        fields.forEach( (field) -> {
+        var searchParamFields = getFieldsWithAnnotation(searchSourceObject.getClass(), SearchParam.class);
+        searchParamFields.forEach( (field) -> {
             var searchParam = field.getAnnotation(SearchParam.class);
             addCondition(searchParam, field);
         });
 
         // extract limit
-        fields = getFieldsWithAnnotation(searchSourceObject.getClass(), Limit.class);
+        var fields = getFieldsWithAnnotation(searchSourceObject.getClass(), Limit.class);
         if (fields.size() > 0) {
             var limitParam = fields.get(0).getAnnotation(Limit.class);
             populateLimit(limitParam, fields.get(0));
@@ -54,6 +53,13 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
         if (fields.size() > 0) {
             var limitParam = fields.get(0).getAnnotation(Offset.class);
             populateLimitOffset(limitParam, fields.get(0));
+        }
+
+        // extract orderBy fields
+        fields = getFieldsWithAnnotation(searchSourceObject.getClass(), OrderBy.class);
+        if (fields.size() > 0) {
+            var orderBy = fields.get(0).getAnnotation(OrderBy.class);
+            populateOrderBy(orderBy, fields.get(0), searchParamFields);
         }
     }
 
@@ -153,6 +159,84 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
             offset = null;
     }
 
+    protected void populateOrderBy(OrderBy annotation, Field field, List<Field> searchParamFields) {
+        field.setAccessible(true);
+        Object value;
+        try {
+            value =  field.get(searchSourceObject);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        String s = value.toString();
+        var strings = Arrays.stream(s.split(",")).collect(Collectors.toList());
+        var orderItems = convertOrderList(strings);
+
+        if (annotation.ignoreUnknownFields()) {
+            // build map of fields
+            HashMap<String, Field> fieldsMap = new HashMap<>();
+            searchParamFields.forEach((item) -> fieldsMap.put(item.getName().toLowerCase(), item));
+
+            // iterator over order fields
+            orderItems.forEach((orderItem -> {
+                // get field from SearchParam fields list
+                var f = fieldsMap.get(orderItem.itemName.toLowerCase());
+                if (f != null) {
+                    orderItem.knownField = true;
+                    // get annotation SearchParam
+                    var fieldAnnotation = f.getAnnotation(SearchParam.class);
+                    // get field alias from annotation
+                    orderItem.searchParamFieldName = fieldAnnotation.fieldName();
+                }
+            }));
+        }
+
+        // populate orderBy part
+        final StringBuilder sb = new StringBuilder("order by ");
+        if (annotation.ignoreUnknownFields()) {
+            // build list with known fields (has related fields with @SearchParam annotation and same name
+            var known = orderItems.stream()
+                    .filter(orderItem -> orderItem.knownField)
+                    .collect(Collectors.toList());
+
+            // if there is no known field then exit
+            if (known.isEmpty()) {
+                orderBy = "";
+                return;
+            }
+
+            var first = known.get(0);
+            known.forEach(item -> {
+                // if the element is the first element, no comma is used
+                if (item != first) {
+                    sb.append(",");
+                }
+                sb.append(item.getSearchParamFieldName())
+                        .append(" ")
+                        .append(item.getDirection().name());
+            });
+        } else {
+            var first = orderItems.get(0);
+            orderItems.forEach(orderItem -> {
+                // if the element is the first element, no comma is used
+                if (orderItem != first) {
+                    sb.append(",");
+                }
+                sb.append(orderItem.getItemName())
+                        .append(" ")
+                        .append(orderItem.getDirection().name());
+            });
+        }
+
+        orderBy = sb.toString();
+    }
+
+    public static List<OrderItem> convertOrderList(List<String> sourceList) {
+        List<OrderItem> orderItems = new ArrayList<>();
+        sourceList.forEach((item) -> orderItems.add(new OrderItem(item.trim())));
+        return orderItems;
+    }
+
     public static List<Field> getFieldsWithAnnotation(Class<?> clazz, Class<? extends Annotation> annotation) {
         List<Field> annotatedFields = new ArrayList<>();
 
@@ -187,5 +271,32 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
     @Override
     public Integer getLimitOffset() {
         return offset;
+    }
+
+    @Getter
+    @Setter
+    public static class OrderItem {
+        private String itemString;
+        private String itemName;
+        private String searchParamFieldName;
+        private OrderDirection direction;
+        private boolean knownField;
+
+        public OrderItem(String itemString) {
+            this.itemString = itemString;
+            if (itemString.contains(" ")) {
+                int spaceIndex = itemString.indexOf(" ");
+                itemName = itemString.substring(0, spaceIndex);
+                var directionString = itemString.substring(spaceIndex + 1);
+                if (directionString.equalsIgnoreCase("desc"))
+                    direction = OrderDirection.DESC;
+                else
+                    direction = OrderDirection.ASC;
+            } else {
+                itemName = itemString;
+                direction = OrderDirection.ASC;
+            }
+        }
+
     }
 }
