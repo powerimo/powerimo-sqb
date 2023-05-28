@@ -163,9 +163,16 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
         field.setAccessible(true);
         Object value;
         try {
-            value =  field.get(searchSourceObject);
+            value = field.get(searchSourceObject);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        }
+
+        if (value == null && !Objects.equals(annotation.defaultValue(), "")) {
+            value = annotation.defaultValue();
+        } else {
+            orderBy = "";
+            return;
         }
 
         String s = value.toString();
