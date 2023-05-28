@@ -169,7 +169,7 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
         }
 
         if (value == null) {
-            if (annotation.defaultValue() == null) {
+            if (Objects.equals(annotation.defaultValue(), "")) {
                 orderBy = "";
                 return;
             }
