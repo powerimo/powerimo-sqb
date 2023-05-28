@@ -1,52 +1,22 @@
 package org.powerimo.sqb.std;
 
 import lombok.Data;
-import org.powerimo.sqb.Condition;
-import org.powerimo.sqb.ConditionType;
-import org.powerimo.sqb.SearchParamsProvider;
-import org.powerimo.sqb.TableSource;
+import org.powerimo.sqb.*;
 
 import java.util.LinkedList;
 import java.util.List;
 
 @Data
-public class MapSearchParams implements SearchParamsProvider {
+public class StdSearchParams implements SearchParamsProvider, FromInfo {
     private List<Condition> conditionList = new LinkedList<>();
-    private TableSource primaryTable;
-    private String selectFields = "*";
     private String orderBy;
     private Integer limit;
+    private Integer offset;
+    private String selectSql;
 
     @Override
     public List<Condition> getConditions() {
         return conditionList;
-    }
-
-    @Override
-    public TableSource getPrimaryTable() {
-        return primaryTable;
-    }
-
-    @Override
-    public void setPrimaryTable(TableSource source) {
-        primaryTable = source;
-    }
-
-    @Override
-    public void primaryTable(String table, String alias) {
-        primaryTable = new TableSource();
-        primaryTable.setTable(table);
-        primaryTable.setAlias(alias);
-    }
-
-    @Override
-    public String getSelectFields() {
-        return selectFields;
-    }
-
-    @Override
-    public void setSelectFields(String fields) {
-        selectFields = fields;
     }
 
     @Override
@@ -55,8 +25,23 @@ public class MapSearchParams implements SearchParamsProvider {
     }
 
     @Override
-    public void setLimit(Integer value) {
-        this.limit = value;
+    public Integer getLimitOffset() {
+        return offset;
+    }
+
+    @Override
+    public String getSelectText() {
+        return null;
+    }
+
+    @Override
+    public String getFromText() {
+        return null;
+    }
+
+    @Override
+    public String getSelectFromText() {
+        return selectSql;
     }
 
     public static Builder builder() {
@@ -65,23 +50,47 @@ public class MapSearchParams implements SearchParamsProvider {
 
     public static class Builder {
         private final List<Condition> conditionList = new LinkedList<>();
-        private String table;
+        private String tableName;
         private String alias;
+        private String selectSql;
+        private Integer limit;
+        private Integer limitOffset;
 
-        public MapSearchParams build() {
-            MapSearchParams params = new MapSearchParams();
+        public StdSearchParams build() {
+            StdSearchParams params = new StdSearchParams();
             params.conditionList = conditionList;
-            params.primaryTable(table, alias);
+
+            // build sql
+            if (selectSql != null)
+                params.selectSql = selectSql;
+            else if (tableName != null) {
+                params.selectSql = "select * from "
+                        + tableName
+                        + (alias != null ? " " + alias : "");
+            }
+
+            params.limit = limit;
+            params.offset = limitOffset;
             return params;
         }
 
-        public Builder table(String table) {
-            this.table = table;
+        public Builder table(String tableName, String alias) {
+            this.tableName = tableName;
+            this.alias = tableName == null ? null : alias;
             return this;
         }
 
-        public Builder alias(String alias) {
-            this.alias = alias;
+        public Builder table(String table) {
+            return this.table(table, null);
+        }
+
+        public Builder alias(String value) {
+            this.alias = value;
+            return this;
+        }
+
+        public Builder selectSql(String sql) {
+            this.selectSql = sql;
             return this;
         }
 
@@ -133,5 +142,14 @@ public class MapSearchParams implements SearchParamsProvider {
             return this;
         }
 
+        public Builder limit(Integer limitValue, Integer offset) {
+            this.limit = limitValue;
+            this.limitOffset = offset;
+            return this;
+        }
+
+        public Builder limit(Integer limitValue) {
+            return limit(limitValue, null);
+        }
     }
 }

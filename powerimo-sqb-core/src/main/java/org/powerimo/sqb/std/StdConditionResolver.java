@@ -47,6 +47,9 @@ public class StdConditionResolver implements ConditionResolver {
             case IN_SQL:
                 conditionInSql();
                 break;
+            case LIKE:
+                conditionLike();
+                break;
             default:
                 throw new SqbException("Not supported condition type: " + condition.getType());
         }
@@ -54,7 +57,11 @@ public class StdConditionResolver implements ConditionResolver {
 
     protected String getNextParamName() {
         int n = details.getParamCounter();
-        return ":p" + n;
+        return "p" + n;
+    }
+
+    protected String inlineParamName(String name) {
+        return ":" + name;
     }
 
     protected QueryDetailParam createParam(String name, Condition condition) {
@@ -68,13 +75,13 @@ public class StdConditionResolver implements ConditionResolver {
 
     protected void conditionEqual() {
         var name = getNextParamName();
-        details.addWhere(condition.getField() + "=" + name);
+        details.addWhere(condition.getField() + "=" + inlineParamName(name));
         details.getQueryParams().add(createParam(name, condition));
     }
 
     protected void conditionNotEqual() {
         var name = getNextParamName();
-        details.addWhere(condition.getField() + "<>" + name);
+        details.addWhere(condition.getField() + "<>" + inlineParamName(name));
         details.getQueryParams().add(createParam(name, condition));
     }
 
@@ -92,25 +99,31 @@ public class StdConditionResolver implements ConditionResolver {
 
     protected void conditionGreater() {
         var name = getNextParamName();
-        details.addWhere(condition.getField() + ">" + name);
+        details.addWhere(condition.getField() + ">" + inlineParamName(name));
         details.getQueryParams().add(createParam(name, condition));
     }
 
     protected void conditionGreaterOrEqual() {
         var name = getNextParamName();
-        details.addWhere(condition.getField() + ">=" + name);
+        details.addWhere(condition.getField() + ">=" + inlineParamName(name));
         details.getQueryParams().add(createParam(name, condition));
     }
 
     protected void conditionLess() {
         var name = getNextParamName();
-        details.addWhere(condition.getField() + "<" + name);
+        details.addWhere(condition.getField() + "<" + inlineParamName(name));
         details.getQueryParams().add(createParam(name, condition));
     }
 
     protected void conditionLessOrEqual() {
         var name = getNextParamName();
-        details.addWhere(condition.getField() + "<=" + name);
+        details.addWhere(condition.getField() + "<=" + inlineParamName(name));
+        details.getQueryParams().add(createParam(name, condition));
+    }
+
+    protected void conditionLike() {
+        var name = getNextParamName();
+        details.addWhere(condition.getField() + " like " + inlineParamName(name));
         details.getQueryParams().add(createParam(name, condition));
     }
 
@@ -144,9 +157,9 @@ public class StdConditionResolver implements ConditionResolver {
                     var name = getNextParamName();
 
                     if (!first) {
-                        sbTmp.append(",").append(name);
+                        sbTmp.append(",").append(inlineParamName(name));
                     } else {
-                        sbTmp.append(name);
+                        sbTmp.append(inlineParamName(name));
                         first = false;
                     }
 

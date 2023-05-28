@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class TestStdConditionResolver {
     private final StdConditionResolver resolver = new StdConditionResolver();
 
-    private StandardSimpleQueryBuilder createSqb() {
-        var sqb = new StandardSimpleQueryBuilder();
+    private StdSimpleQueryBuilder createSqb() {
+        var sqb = new StdSimpleQueryBuilder();
         sqb.setFromPart("from table1");
         return sqb;
     }
