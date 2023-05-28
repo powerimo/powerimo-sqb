@@ -149,4 +149,14 @@ public class TestStdSearchSourceExtractor {
         assertEquals("order by notExists1 ASC,notExists2 DESC", extractor.getOrderBy());
     }
 
+    @Test
+    void testOrderNull() {
+        var source = new ExampleSearchParamsOrdered2();
+        source.orderString = null;
+        var extractor = new StdSearchSourceExtractor(source);
+
+        assertNotNull(extractor.getOrderBy());
+    }
+
+
 }
