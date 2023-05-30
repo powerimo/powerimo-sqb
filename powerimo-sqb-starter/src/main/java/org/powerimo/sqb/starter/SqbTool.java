@@ -25,21 +25,33 @@ public class SqbTool {
             } else  {
                 if (item.getValue() instanceof Instant) {
                     mapInstant(parameterSource, item);
+                } if (item.getValue() instanceof Enum) {
+                    mapEnumValue(parameterSource, item);
+                } else {
+                    parameterSource.addValue(item.getName(), item.getValue());
                 }
-                parameterSource.addValue(item.getName(), item.getValue());
             }
         }
         return parameterSource;
     }
 
-    public static void mapInstant(@NonNull MapSqlParameterSource params, @NonNull QueryDetailParam param) {
+    public static void mapInstant(@NonNull MapSqlParameterSource parameterSource, @NonNull QueryDetailParam param) {
         if (param.getValue() == null) {
-            params.addValue(param.getName(), null);
+            parameterSource.addValue(param.getName(), null);
             return;
         }
         Instant instantValue = (Instant) param.getValue();
         Timestamp t = Timestamp.from(instantValue);
-        params.addValue(param.getName(), t);
+        parameterSource.addValue(param.getName(), t);
+    }
+
+    public static void mapEnumValue(@NonNull MapSqlParameterSource parameterSource, @NonNull QueryDetailParam param) {
+        if (param.getValue() == null) {
+            parameterSource.addValue(param.getName(), null);
+            return;
+        }
+        String s = param.getValue().toString();
+        parameterSource.addValue(param.getName(), s);
     }
 
 }
