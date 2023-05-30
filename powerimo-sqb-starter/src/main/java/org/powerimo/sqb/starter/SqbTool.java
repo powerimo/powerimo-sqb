@@ -25,7 +25,7 @@ public class SqbTool {
             } else  {
                 if (item.getValue() instanceof Instant) {
                     mapInstant(parameterSource, item);
-                } if (item.getValue() instanceof Enum) {
+                } else if (item.getValue() instanceof Enum) {
                     mapEnumValue(parameterSource, item);
                 } else {
                     parameterSource.addValue(item.getName(), item.getValue());
