@@ -17,7 +17,7 @@ public class TestStdSearchParams {
                 .whereNullableEqual("f3", null)
                 .whereInSql("f4", "select id from t2")
                 .whereNotInSql("f4", "select id from t3")
-                .limit(11, 151)
+                .limit(11L, 151L)
                 .build();
 
         assertEquals(4, params.getConditionList().size());
