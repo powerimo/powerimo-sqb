@@ -10,4 +10,13 @@ public class QueryDetailParam {
     private Object value;
     private int sqlType;
     private String typeName;
+
+    public static QueryDetailParam of(String paramName, Condition condition) {
+        return QueryDetailParam.builder()
+                .name(paramName)
+                .value(condition.getValue())
+                .sqlType(condition.getSqlType())
+                .typeName(condition.getSqlTypeName())
+                .build();
+    }
 }

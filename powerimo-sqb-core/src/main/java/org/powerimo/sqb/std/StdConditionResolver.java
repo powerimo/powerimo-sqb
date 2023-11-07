@@ -64,25 +64,16 @@ public class StdConditionResolver implements ConditionResolver {
         return ":" + name;
     }
 
-    protected QueryDetailParam createParam(String name, Condition condition) {
-        return QueryDetailParam.builder()
-                .name(name)
-                .value(condition.getValue())
-                .sqlType(condition.getSqlType())
-                .typeName(condition.getSqlTypeName())
-                .build();
-    }
-
     protected void conditionEqual() {
         var name = getNextParamName();
         details.addWhere(condition.getField() + "=" + inlineParamName(name));
-        details.getQueryParams().add(createParam(name, condition));
+        details.getQueryParams().add(QueryDetailParam.of(name, condition));
     }
 
     protected void conditionNotEqual() {
         var name = getNextParamName();
         details.addWhere(condition.getField() + "<>" + inlineParamName(name));
-        details.getQueryParams().add(createParam(name, condition));
+        details.getQueryParams().add(QueryDetailParam.of(name, condition));
     }
 
     protected void conditionCustom() {
@@ -100,31 +91,31 @@ public class StdConditionResolver implements ConditionResolver {
     protected void conditionGreater() {
         var name = getNextParamName();
         details.addWhere(condition.getField() + ">" + inlineParamName(name));
-        details.getQueryParams().add(createParam(name, condition));
+        details.getQueryParams().add(QueryDetailParam.of(name, condition));
     }
 
     protected void conditionGreaterOrEqual() {
         var name = getNextParamName();
         details.addWhere(condition.getField() + ">=" + inlineParamName(name));
-        details.getQueryParams().add(createParam(name, condition));
+        details.getQueryParams().add(QueryDetailParam.of(name, condition));
     }
 
     protected void conditionLess() {
         var name = getNextParamName();
         details.addWhere(condition.getField() + "<" + inlineParamName(name));
-        details.getQueryParams().add(createParam(name, condition));
+        details.getQueryParams().add(QueryDetailParam.of(name, condition));
     }
 
     protected void conditionLessOrEqual() {
         var name = getNextParamName();
         details.addWhere(condition.getField() + "<=" + inlineParamName(name));
-        details.getQueryParams().add(createParam(name, condition));
+        details.getQueryParams().add(QueryDetailParam.of(name, condition));
     }
 
     protected void conditionLike() {
         var name = getNextParamName();
         details.addWhere(condition.getField() + " like " + inlineParamName(name));
-        details.getQueryParams().add(createParam(name, condition));
+        details.getQueryParams().add(QueryDetailParam.of(name, condition));
     }
 
     protected void conditionInSql() {
