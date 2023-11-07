@@ -41,6 +41,8 @@ public class Sqb {
 
     protected void prepare() {
         var info = SearchAnnotationProcessor.extractInfo(params);
+        if (fromInfo != null)
+            info.setFromInfo(fromInfo);
         queryBuilder.prepare(info.getFromInfo(), info.getSearchParamsProvider());
     }
 

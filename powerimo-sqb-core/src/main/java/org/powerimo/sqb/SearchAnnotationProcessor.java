@@ -16,6 +16,13 @@ public class SearchAnnotationProcessor {
             buildFromInfo(annotation, extractedInfo);
             buildSearchProvider(annotation, extractedInfo);
         }
+
+        if (extractedInfo.getSearchParamsProvider() == null) {
+            if (searchParams instanceof SearchParamsProvider) {
+                extractedInfo.setSearchParamsProvider((SearchParamsProvider) searchParams);
+            }
+        }
+
         return extractedInfo;
     }
 
