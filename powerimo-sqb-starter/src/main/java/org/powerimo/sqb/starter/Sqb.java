@@ -1,5 +1,6 @@
 package org.powerimo.sqb.starter;
 
+import lombok.NonNull;
 import org.powerimo.sqb.FromInfo;
 import org.powerimo.sqb.QueryDetailParam;
 import org.powerimo.sqb.SearchParamsProvider;
@@ -8,6 +9,9 @@ import org.powerimo.sqb.std.StdSimpleQueryBuilder;
 import org.powerimo.sqb.std.StdSearchSourceExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 public class Sqb {
@@ -52,6 +56,19 @@ public class Sqb {
 
     public MapSqlParameterSource getNamedParams() {
         return SqbTool.createNamedParams(queryBuilder);
+    }
+
+    public Query createJpaQuery(@NonNull EntityManager entityManager, @NonNull Class<?> tClass) {
+        var query = entityManager.createNativeQuery(this.getQuery(), tClass);
+        for (var item : getDetailParams()) {
+            query.setParameter(item.getName(), item.getValue());
+        }
+        return query;
+    }
+
+    public <T> List<T> executeJpaQuery(@NonNull EntityManager entityManager, @NonNull Class<T> tClass) {
+        var query = createJpaQuery(entityManager, tClass);
+        return (List<T>) query.getResultList();
     }
 
     public List<QueryDetailParam> getDetailParams() {
