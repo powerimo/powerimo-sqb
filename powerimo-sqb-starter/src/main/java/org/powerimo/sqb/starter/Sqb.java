@@ -3,15 +3,14 @@ package org.powerimo.sqb.starter;
 import lombok.NonNull;
 import org.powerimo.sqb.FromInfo;
 import org.powerimo.sqb.QueryDetailParam;
-import org.powerimo.sqb.SearchParamsProvider;
 import org.powerimo.sqb.SearchAnnotationProcessor;
-import org.powerimo.sqb.std.StdSimpleQueryBuilder;
+import org.powerimo.sqb.SearchParamsProvider;
 import org.powerimo.sqb.std.StdSearchSourceExtractor;
+import org.powerimo.sqb.std.StdSimpleQueryBuilder;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import java.util.List;
 
 public class Sqb {
