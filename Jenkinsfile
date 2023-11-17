@@ -1,5 +1,6 @@
 pipeline {
     environment {
+        NSS_API_KEY = credentials('powerimo-nss-api-key')
         FULL_PATH_BRANCH = "${env.BRANCH_NAME}"
         RELEASE_BRANCH = FULL_PATH_BRANCH.substring(FULL_PATH_BRANCH.lastIndexOf('/') + 1, FULL_PATH_BRANCH.length()).trim()
     }
