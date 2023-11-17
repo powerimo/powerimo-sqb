@@ -51,12 +51,9 @@ pipeline {
     }
 
     post {
-         success {
-             sh '/var/jenkins_home/deployscripts/send-message-success.sh'
-         }
-         failure {
-             sh '/var/jenkins_home/deployscripts/send-message-fail.sh'
-         }
+        always {
+            nssSendJobResult(recipients: "AndewilEventsChannel")
+        }
     }
 
 }
