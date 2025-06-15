@@ -1,0 +1,43 @@
+name: Pull Request Check
+
+on:
+  pull_request:
+    branches:
+      - "main"
+      - "release/**"
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-global
+          restore-keys: |
+            maven-${{ runner.os }}-
+            maven-
+
+      - name: Setup Maven Settings
+        uses: ./.github/actions/setup-maven-settings
+        with:
+          server-id: andewil-nexus
+          username: ${{ secrets.NEXUS_USERNAME }}
+          password: ${{ secrets.NEXUS_PASSWORD }}
+
+      - name: Compile code
+        run: mvn -B clean compile
+
+      - name: Run tests
+        run: mvn -B test
