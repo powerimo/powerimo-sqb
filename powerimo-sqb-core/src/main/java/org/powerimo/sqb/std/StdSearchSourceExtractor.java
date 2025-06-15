@@ -18,8 +18,8 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
     private Object searchSourceObject;
     private final List<Condition> conditionList = new LinkedList<>();
     private String orderBy;
-    private Integer limit;
-    private Integer offset;
+    private Long limit;
+    private Long offset;
     private boolean isSourceObject = false;
 
     public StdSearchSourceExtractor(@NonNull Object obj) {
@@ -125,9 +125,10 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
         }
 
         if (value instanceof Integer) {
-            limit = (Integer) value;
+            var v = (Integer) value;
+            limit = v.longValue();
         } else if (value instanceof Long) {
-            limit = ((Long) value).intValue();
+            limit = (Long) value;
         } else
             limit = null;
     }
@@ -152,9 +153,10 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
         }
 
         if (value instanceof Integer) {
-            offset = (Integer) value;
+            var v = (Integer) value;
+            offset = v.longValue();
         } else if (value instanceof Long) {
-            offset = ((Long) value).intValue();
+            offset = (Long) value;
         } else
             offset = null;
     }
@@ -268,7 +270,7 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
     }
 
     @Override
-    public Integer getLimit() {
+    public Long getLimit() {
         return limit;
     }
 
@@ -277,7 +279,7 @@ public class StdSearchSourceExtractor implements SearchParamsProvider {
     }
 
     @Override
-    public Integer getLimitOffset() {
+    public Long getLimitOffset() {
         return offset;
     }
 

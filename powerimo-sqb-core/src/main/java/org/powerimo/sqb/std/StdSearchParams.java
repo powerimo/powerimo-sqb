@@ -10,8 +10,8 @@ import java.util.List;
 public class StdSearchParams implements SearchParamsProvider, FromInfo {
     private List<Condition> conditionList = new LinkedList<>();
     private String orderBy;
-    private Integer limit;
-    private Integer offset;
+    private Long limit;
+    private Long offset;
     private String selectSql;
 
     @Override
@@ -20,12 +20,12 @@ public class StdSearchParams implements SearchParamsProvider, FromInfo {
     }
 
     @Override
-    public Integer getLimit() {
+    public Long getLimit() {
         return limit;
     }
 
     @Override
-    public Integer getLimitOffset() {
+    public Long getLimitOffset() {
         return offset;
     }
 
@@ -53,8 +53,8 @@ public class StdSearchParams implements SearchParamsProvider, FromInfo {
         private String tableName;
         private String alias;
         private String selectSql;
-        private Integer limit;
-        private Integer limitOffset;
+        private Long limit;
+        private Long limitOffset;
 
         public StdSearchParams build() {
             StdSearchParams params = new StdSearchParams();
@@ -142,13 +142,13 @@ public class StdSearchParams implements SearchParamsProvider, FromInfo {
             return this;
         }
 
-        public Builder limit(Integer limitValue, Integer offset) {
+        public Builder limit(Long limitValue, Long offset) {
             this.limit = limitValue;
             this.limitOffset = offset;
             return this;
         }
 
-        public Builder limit(Integer limitValue) {
+        public Builder limit(Long limitValue) {
             return limit(limitValue, null);
         }
     }
