@@ -10,6 +10,9 @@
     </parent>
 
     <artifactId>powerimo-sqb-starter</artifactId>
+    <name>powerimo-sqb-starter</name>
+    <description>Spring Starter for Simple Query Builder</description>
+    <url>https://github.com/powerimo/powerimo-sqb</url>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

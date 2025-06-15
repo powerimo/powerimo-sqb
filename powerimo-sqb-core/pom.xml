@@ -10,6 +10,9 @@
     </parent>
 
     <artifactId>powerimo-sqb-core</artifactId>
+    <name>Powerimo SQB core</name>
+    <description>Core Simple Query Builder components</description>
+    <url>https://github.com/powerimo/powerimo-sqb</url>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

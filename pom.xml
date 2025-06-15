@@ -8,6 +8,10 @@
     <artifactId>powerimo-sqb</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
+    <name>Powerimo Simple Query Builder</name>
+    <description>Query builder for translation REST calls to SQL</description>
+    <url>https://github.com/powerimo/powerimo-sqb</url>
+
     <modules>
         <module>powerimo-sqb-core</module>
         <module>powerimo-sqb-starter</module>
