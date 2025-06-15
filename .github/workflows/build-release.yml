@@ -16,6 +16,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: maven-${{ runner.os }}-global
+        restore-keys: |
+          maven-${{ runner.os }}-
+          maven-
+
     - name: Determine Release Version
       id: set-version
       if: startsWith(github.ref, 'refs/heads/release/')
