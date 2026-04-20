@@ -28,13 +28,13 @@ public class SearchAnnotationProcessor {
 
     public static void buildFromInfo(SearchSource annotation, ProvidersConfig extractedInfo) {
         extractedInfo.fromInfo = null;
-        if (annotation.resource() != null) {
+        if (annotation.resource() != null && !annotation.resource().isEmpty()) {
             extractedInfo.fromInfo = new FromResourceInfo(annotation.resource());
-        } else if (annotation.selectFromSql() != null) {
+        } else if (annotation.selectFromSql() != null && !annotation.selectFromSql().isEmpty()) {
             extractedInfo.fromInfo = new FromStringInfo()
                     .selectFrom(annotation.selectFromSql());
-        } else if (annotation.table() != null) {
-            var aliasPart = annotation.alias() != null ? " " + annotation.alias() : "";
+        } else if (annotation.table() != null && !annotation.table().isEmpty()) {
+            var aliasPart = annotation.alias() != null && !annotation.alias().isEmpty() ? " " + annotation.alias() : "";
             var fromPart = annotation.table() + aliasPart;
             extractedInfo.fromInfo = new FromStringInfo()
                     .select("select *")
