@@ -56,6 +56,7 @@ public class StdSimpleQueryBuilder implements SimpleQueryBuilder, QueryDetails {
         selectFromPart = null;
         fromPart = null;
         queryText = null;
+        wherePart.setLength(0);
         queryDetailParams.clear();
         paramCounter = 0;
 

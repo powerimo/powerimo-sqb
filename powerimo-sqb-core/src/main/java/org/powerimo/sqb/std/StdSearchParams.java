@@ -98,6 +98,7 @@ public class StdSearchParams implements SearchParamsProvider, FromInfo {
             Condition condition = new Condition();
             condition.setField(field);
             condition.setType(ConditionType.EQUAL);
+            condition.setValue(value);
             conditionList.add(condition);
             return this;
         }

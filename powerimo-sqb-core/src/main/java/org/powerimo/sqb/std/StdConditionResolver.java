@@ -41,14 +41,20 @@ public class StdConditionResolver implements ConditionResolver {
             case GREATER_OR_EQUAL:
                 conditionGreaterOrEqual();
                 break;
-            case IN_LIST:
-                conditionInList();
-                break;
             case IN_SQL:
                 conditionInSql();
                 break;
+            case NOT_IN_SQL:
+                conditionNotInSql();
+                break;
             case LIKE:
                 conditionLike();
+                break;
+            case IN_LIST:
+                conditionInList();
+                break;
+            case NOT_IN_LIST:
+                conditionNotInList();
                 break;
             default:
                 throw new SqbException("Not supported condition type: " + condition.getType());
@@ -122,6 +128,10 @@ public class StdConditionResolver implements ConditionResolver {
         details.addWhere(condition.getField() + " in " + condition.getCustomConditionText());
     }
 
+    protected void conditionNotInSql() {
+        details.addWhere(condition.getField() + " not in " + condition.getCustomConditionText());
+    }
+
     protected void conditionInList() {
         if (condition.getValue() == null) {
             details.addWhere(condition.getField() + " in (select null)");
@@ -167,6 +177,53 @@ public class StdConditionResolver implements ConditionResolver {
             details.addWhere(sbTmp.toString());
         } else
             throw new SqbException("Condition type is IN_LIST but the value is not a List. Field=" + condition.getField());
+    }
+
+    protected void conditionNotInList() {
+        if (condition.getValue() == null) {
+            details.addWhere(condition.getField() + " not in (select null)");
+            return;
+        }
+
+        if (condition.getValue() instanceof List) {
+            List<?> list = (List<?>) condition.getValue();
+            boolean isListOfObjects = true;
+            for (Object element : list) {
+                if (!(element instanceof Object)) {
+                    isListOfObjects = false;
+                    break;
+                }
+            }
+            if (!isListOfObjects)
+                throw new SqbException("Condition type is NOT_IN_LIST but the value is not a List of Object. Field=" + condition.getField());
+
+            StringBuilder sbTmp = new StringBuilder(condition.getField() + " not in (");
+            var first = true;
+            for (Object element : list) {
+                if (element instanceof Object) {
+
+                    var name = getNextParamName();
+
+                    if (!first) {
+                        sbTmp.append(",").append(inlineParamName(name));
+                    } else {
+                        sbTmp.append(inlineParamName(name));
+                        first = false;
+                    }
+
+                    var param = QueryDetailParam.builder()
+                            .name(name)
+                            .value(element)
+                            .sqlType(condition.getSqlType())
+                            .typeName(condition.getSqlTypeName())
+                            .build();
+                    details.getQueryParams().add(param);
+                }
+            }
+            sbTmp.append(")");
+            details.addWhere(sbTmp.toString());
+        } else
+            throw new SqbException("Condition type is NOT_IN_LIST but the value is not a List. Field=" + condition.getField());
     }
 
 }
