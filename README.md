@@ -52,7 +52,7 @@ Add the dependency to your `pom.xml`:
 <dependency>
     <groupId>org.powerimo</groupId>
     <artifactId>powerimo-sqb-starter</artifactId>
-    <version>${powerimo-sqb.version}</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
